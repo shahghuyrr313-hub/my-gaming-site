@@ -62,6 +62,8 @@
         let speed = 100; // Initial game speed (milliseconds between updates)
         const minSpeed = 50; // Minimum speed to prevent it from getting too fast
 
+        if(window.location.search === "?start=true") startGame();
+
         // Function to draw the game
         function drawGame() {
             // Clear the canvas
