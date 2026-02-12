@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improved Snake Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 2px solid #333;
+            background-color: #fff;
+        }
+        #score {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Snake Game</h1>
+    <div id="score">Score: 0 | Level: 1</div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <br>
+    <button id="restartBtn">Restart Game</button>
+
+    <script>
+        // Get the canvas and its context
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game variables
+        const gridSize = 20; // Size of each grid cell
+        const tileCount = canvas.width / gridSize; // Number of tiles in each direction
+
+        let snake = [{x: 10, y: 10}]; // Snake starts with one segment at center
+        let food = {x: 15, y: 15}; // Initial food position
+        let dx = 0; // Horizontal velocity
+        let dy = 0; // Vertical velocity
+        let score = 0; // Player score
+        let level = 1; // Current level
+        let speed = 100; // Initial game speed (milliseconds between updates)
+        const minSpeed = 50; // Minimum speed to prevent it from getting too fast
+
+        // Function to draw the game
+        function drawGame() {
+            // Clear the canvas
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw snake
+            ctx.fillStyle = '#4CAF50';
+            for (let segment of snake) {
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+            }
+
+            // Draw food
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+        }
+
+        // Function to update the game state
+        function updateGame() {
+            // Move the snake head
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            snake.unshift(head); // Add new head
+
+            // Check if snake eats food
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                document.getElementById('score').textContent = 'Score: ' + score + ' | Level: ' + level;
+                // Generate new food
+                food = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+
+                // Check for level up (every 5 points)
+                if (score % 5 === 0 && score > 0) {
+                    level++;
+                    // Increase speed (decrease interval time)
+                    speed = Math.max(minSpeed, speed - 10);
+                    document.getElementById('score').textContent = 'Score: ' + score + ' | Level: ' + level;
+                }
+            } else {
+                // Remove tail if no food eaten
+                snake.pop();
+            }
+
+            // Check for collisions
+            // Wall collision
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                gameOver();
+                return;
+            }
+            // Self collision
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    gameOver();
+                    return;
+                }
+            }
+        }
+
+        // Function to handle game over
+        function gameOver() {
+            alert('Game Over! Your score: ' + score + ' | Level: ' + level);
+            resetGame();
+        }
+
+        // Function to reset the game
+        function resetGame() {
+            snake = [{x: 10, y: 10}];
+            food = {x: 15, y: 15};
+            dx = 0;
+            dy = 0;
+            score = 0;
+            level = 1;
+            speed = 100;
+            document.getElementById('score').textContent = 'Score: 0 | Level: 1';
+        }
+
+        // Function to change direction based on key presses
+        function changeDirection(event) {
+            const LEFT_KEY = 37;
+            const RIGHT_KEY = 39;
+            const UP_KEY = 38;
+            const DOWN_KEY = 40;
+
+            const keyPressed = event.keyCode;
+            const goingUp = dy === -1;
+            const goingDown = dy === 1;
+            const goingRight = dx === 1;
+            const goingLeft = dx === -1;
+
+            if (keyPressed === LEFT_KEY && !goingRight) {
+                dx = -1;
+                dy = 0;
+            }
+            if (keyPressed === UP_KEY && !goingDown) {
+                dx = 0;
+                dy = -1;
+            }
+            if (keyPressed === RIGHT_KEY && !goingLeft) {
+                dx = 1;
+                dy = 0;
+            }
+            if (keyPressed === DOWN_KEY && !goingUp) {
+                dx = 0;
+                dy = 1;
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('keydown', changeDirection);
+        document.getElementById('restartBtn').addEventListener('click', resetGame);
+
+        // Main game loop using setTimeout for variable speed
+        function gameLoop() {
+            updateGame();
+            drawGame();
+            setTimeout(gameLoop, speed);
+        }
+
+        // Start the game loop
+        gameLoop();
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Gaming Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Privacy Policy</h1>
+    <p>Welcome to our gaming website. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information.</p>
+    <h2>Information We Collect</h2>
+    <p>We may collect personal information such as your name, email address, and gaming preferences when you register or play games on our site.</p>
+    <h2>How We Use Your Information</h2>
+    <p>Your information is used to provide personalized gaming experiences, improve our services, and communicate with you about updates.</p>
+    <h2>Data Security</h2>
+    <p>We implement security measures to protect your data from unauthorized access.</p>
+    <h2>Contact Us</h2>
+    <p>If you have any questions, please contact us at privacy@gamingwebsite.com.</p>
+    <p>Last updated: [Current Date]</p>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Gaming Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>About Us</h1>
+    <p>Welcome to our gaming website! We are passionate about bringing you the best gaming experiences. Our team consists of dedicated gamers and developers who love creating fun and engaging games.</p>
+    <h2>Our Mission</h2>
+    <p>To provide high-quality, free-to-play games that entertain and challenge players of all ages.</p>
+    <h2>Our Team</h2>
+    <p>Founded in 2023, our team includes game designers, programmers, and artists who work together to innovate in the gaming world.</p>
+    <h2>Join Us</h2>
+    <p>Follow us on social media or sign up for our newsletter to stay updated on new games and features.</p>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Gaming Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #555;
+        }
+        form {
+            max-width: 400px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Contact Us</h1>
+    <p>Have questions or feedback? We'd love to hear from you! Reach out using the form below or via email.</p>
+    <h2>Get in Touch</h2>
+    <p>Email: support@gamingwebsite.com</p>
+    <p>Phone: (123) 456-7890</p>
+    <form action="#" method="post">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+        
+        <button type="submit">Send Message</button>
+    </form>
+</body>
+</html>
